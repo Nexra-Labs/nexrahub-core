@@ -29,6 +29,15 @@ async function bootstrap() {
       },
       'jwt-auth'
     )
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+        description: 'API key for game authentication',
+      },
+      'api-key-auth',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

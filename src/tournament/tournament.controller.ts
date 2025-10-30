@@ -10,7 +10,7 @@ import { AuthType } from 'src/auth/enums/auth-type.enum';
 import { ActiveGame } from 'src/game/decorator/active-game.decorator';
 
 @ApiTags('Tournaments')
-@ApiSecurity('jwt-auth')
+@ApiSecurity('api-key-auth')
 @Controller('tournament')
 export class TournamentController {
     constructor(
