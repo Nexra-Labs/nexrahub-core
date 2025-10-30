@@ -2,14 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateTournamentDto {
-    @IsMongoId()
-    @IsNotEmpty()
-    @ApiProperty({
-        description: 'Game ID',
-        example: '67188e92b41c0eec54f22b1f'
-    })
-    game: string;
-
     @IsString()
     @ApiProperty({
         example: 'Battle of Nexra',

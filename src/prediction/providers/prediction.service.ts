@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PredictionRepository } from '../repositories/prediction.repository';
 import { IPrediction } from '../interfaces/prediction.interface';
 import { Types } from 'mongoose';
 import { PredictionOptionService } from './prediction-option.service';
 import { CreatePredictionDto } from '../dtos/create-prediction.dto';
 import { TournamentService } from 'src/tournament/providers/tournament.service';
+import { TournamentStatus } from 'src/tournament/enums/tournament-status.enum';
+import { ITournament } from 'src/tournament/interfaces/tournament.interface';
 
 @Injectable()
 export class PredictionService {
@@ -19,6 +21,7 @@ export class PredictionService {
 
         const optionDoc = await this.predictionOptionService.findById(predictionOption, 'odds totalPredictionAmount', {}, ['tournament']);
         if (!optionDoc) throw new NotFoundException('Prediction option not found');
+        if((optionDoc.tournament as any as ITournament).status !== TournamentStatus.PUBLISHED) throw new BadRequestException('Cannot place prediction, tournament is not active for predictions.');
 
         const [prediction] = await Promise.all([
             this.predictionRepo.create({

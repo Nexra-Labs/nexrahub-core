@@ -7,7 +7,7 @@ import {
 import { GameRepository } from '../repositories/game.repository';
 import { CreateGameDto } from '../dtos/create-game.dto';
 import { UpdateGameDto } from '../dtos/update-game.dto';
-import { PopulateOptions, ProjectionType, QueryOptions, Types } from 'mongoose';
+import { FilterQuery, PopulateOptions, ProjectionType, QueryOptions, Types } from 'mongoose';
 import { OtpService } from 'src/otp/providers/otp.service';
 import { randomBytes } from 'crypto';
 import { GameGenreService } from './game-genre.service';
@@ -87,6 +87,10 @@ export class GameService {
         populate?: PopulateOptions | (string | PopulateOptions)[]
     ) {
         return this.gameRepo.findById(id, projection, options, populate);
+    }
+
+    async findByApiKey(apiKey: string) {
+        return this.gameRepo.findOne({ apiKey });
     }
 
     private generateApiKey(): string {
