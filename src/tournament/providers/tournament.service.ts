@@ -22,7 +22,7 @@ export class TournamentService {
         if (!game) {
             throw new NotFoundException('Game not found for the tournament');
         }
-        const tournament = await this.tournamentRepo.create(dto);
+        const tournament = await this.tournamentRepo.create({ ...dto, game: game._id });
         return await this.tournamentRepo.findById(tournament._id, "", {}, { path: 'game', select: 'name' });
     }
 
