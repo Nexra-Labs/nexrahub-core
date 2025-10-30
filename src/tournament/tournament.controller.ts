@@ -87,12 +87,12 @@ export class TournamentController {
             }
         }
     })
-    async update(@Param('tournamentIdupdate') id: string, @Body() dto: UpdateTournamentDto, @ActiveGame("_id") game: string) {
+    async update(@Param('tournamentId') id: string, @Body() dto: UpdateTournamentDto, @ActiveGame("_id") game: string) {
         const result = await this.tournamentService.updateTournament(game, id, dto);
         return { message: 'Tournament updated successfully', tournament: result };
     }
 
-    @Patch(':tournamentIdupdate/publish')
+    @Patch(':tournamentId/publish')
     @Auth(AuthType.ApiKey)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Publish a pending tournament that has not yet started' })
@@ -124,7 +124,7 @@ export class TournamentController {
             }
         }
     })
-    async publish(@Param('id') id: string, @ActiveGame("_id") game: string) {
+    async publish(@Param('tournamentId') id: string, @ActiveGame("_id") game: string) {
         const result = await this.tournamentService.publishTournament(game, id);
         return { message: 'Tournament published successfully', tournament: result };
     }
