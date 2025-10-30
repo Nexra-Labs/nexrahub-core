@@ -10,17 +10,24 @@ import { TournamentService } from './tournament.service';
 import { CreateTournamentEntryDto } from '../dtos/create-tournament-entry.dto';
 import { TournamentStatus } from '../enums/tournament-status.enum';
 import { TournamentEntryRepository } from '../repositories/tournament-entry.repository';
+import { GameService } from 'src/game/providers/game.service';
 
 @Injectable()
 export class TournamentEntryService {
     constructor(
         private readonly tournamentEntryRepo: TournamentEntryRepository,
         private readonly gamerService: GamerService,
+        private readonly gameService: GameService,
         private readonly tournamentService: TournamentService,
         private readonly predictionOptionService: PredictionOptionService,
     ) { }
 
-    async enterTournament(tournament: string | Types.ObjectId, dto: CreateTournamentEntryDto) {
+    async enterTournament(gameId: string | Types.ObjectId, tournament: string | Types.ObjectId, dto: CreateTournamentEntryDto) {
+        const game = await this.gameService.findById(gameId);
+        if (!game) {
+            throw new NotFoundException('Game not found for the tournament');
+        }
+
         const { gamer } = dto;
 
         const tournamentDoc = await this.tournamentService.findById(tournament);
