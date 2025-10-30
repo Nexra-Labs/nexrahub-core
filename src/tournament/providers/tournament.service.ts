@@ -14,11 +14,11 @@ export class TournamentService {
         private readonly gameService: GameService
     ) { }
 
-    async createTournament(dto: CreateTournamentDto): Promise<ITournament> {
+    async createTournament(gameId: string, dto: CreateTournamentDto): Promise<ITournament> {
         if (dto.startTime >= dto.endTime) {
             throw new BadRequestException('Start time must be before end time');
         }
-        const game = await this.gameService.findById(dto.game);
+        const game = await this.gameService.findById(gameId);
         if (!game) {
             throw new NotFoundException('Game not found for the tournament');
         }
@@ -26,7 +26,12 @@ export class TournamentService {
         return await this.tournamentRepo.findById(tournament._id, "", {}, { path: 'game', select: 'name' });
     }
 
-    async updateTournament(id: string, dto: UpdateTournamentDto): Promise<ITournament> {
+    async updateTournament(gameId: string, id: string, dto: UpdateTournamentDto): Promise<ITournament> {
+        const game = await this.gameService.findById(gameId);
+        if (!game) {
+            throw new NotFoundException('Game not found for the tournament');
+        }
+
         const tournament = await this.tournamentRepo.findById(id);
         if (!tournament) throw new NotFoundException('Tournament not found');
 
@@ -42,17 +47,15 @@ export class TournamentService {
             throw new BadRequestException('Start time must be before end time');
         }
 
-        if (dto.game) {
-            const game = await this.gameService.findById(dto.game);
-            if (!game) {
-                throw new NotFoundException('Game not found for the tournament');
-            }
-        }
-
         return await this.tournamentRepo.updateById(tournament._id, dto, { new: true, populate: { path: 'game', select: 'name' } });
     }
 
-    async publishTournament(id: string): Promise<ITournament> {
+    async publishTournament(gameId: string, id: string): Promise<ITournament> {
+        const game = await this.gameService.findById(gameId);
+        if (!game) {
+            throw new NotFoundException('Game not found for the tournament');
+        }
+
         const tournament = await this.tournamentRepo.findById(id);
         if (!tournament) throw new NotFoundException('Tournament not found');
 

@@ -5,6 +5,9 @@ import { CreateTournamentDto } from './dtos/create-tournament.dto';
 import { UpdateTournamentDto } from './dtos/update-tournament.dto';
 import { CreateTournamentEntryDto } from './dtos/create-tournament-entry.dto';
 import { TournamentEntryService } from './providers/tournament-entry.service';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { AuthType } from 'src/auth/enums/auth-type.enum';
+import { ActiveGame } from 'src/game/decorator/active-game.decorator';
 
 @ApiTags('Tournaments')
 @ApiSecurity('jwt-auth')
@@ -16,6 +19,7 @@ export class TournamentController {
     ) { }
 
     @Post('create')
+    @Auth(AuthType.ApiKey)
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a tournament' })
     @ApiResponse({
@@ -46,12 +50,13 @@ export class TournamentController {
             }
         }
     })
-    async create(@Body() dto: CreateTournamentDto) {
-        const result = await this.tournamentService.createTournament(dto);
+    async create(@Body() dto: CreateTournamentDto, @ActiveGame("_id") game: string) {
+        const result = await this.tournamentService.createTournament(game, dto);
         return { message: 'Tournament created successfully', tournament: result };
     }
 
     @Patch(':tournamentId/update')
+    @Auth(AuthType.ApiKey)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Update a pending tournament (if not started)' })
     @ApiResponse({
@@ -82,12 +87,13 @@ export class TournamentController {
             }
         }
     })
-    async update(@Param('tournamentIdupdate') id: string, @Body() dto: UpdateTournamentDto) {
-        const result = await this.tournamentService.updateTournament(id, dto);
+    async update(@Param('tournamentIdupdate') id: string, @Body() dto: UpdateTournamentDto, @ActiveGame("_id") game: string) {
+        const result = await this.tournamentService.updateTournament(game, id, dto);
         return { message: 'Tournament updated successfully', tournament: result };
     }
 
     @Patch(':tournamentIdupdate/publish')
+    @Auth(AuthType.ApiKey)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Publish a pending tournament that has not yet started' })
     @ApiResponse({
@@ -118,12 +124,13 @@ export class TournamentController {
             }
         }
     })
-    async publish(@Param('id') id: string) {
-        const result = await this.tournamentService.publishTournament(id);
+    async publish(@Param('id') id: string, @ActiveGame("_id") game: string) {
+        const result = await this.tournamentService.publishTournament(game, id);
         return { message: 'Tournament published successfully', tournament: result };
     }
 
     @Post(':tournamentId/join')
+    @Auth(AuthType.ApiKey)
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({
         summary: 'Enter a gamer into a tournament',
@@ -151,8 +158,8 @@ export class TournamentController {
             }
         }
     })
-    async joinTournament(@Param('tournamentId') tournamentId: string, @Body() dto: CreateTournamentEntryDto) {
-        const entry = await this.tournamentEntryService.enterTournament(tournamentId, dto);
+    async joinTournament(@Param('tournamentId') tournamentId: string, @Body() dto: CreateTournamentEntryDto, @ActiveGame("_id") game: string) {
+        const entry = await this.tournamentEntryService.enterTournament(game, tournamentId, dto);
         return {
             message: 'Gamer successfully joined the tournament.',
             entry
